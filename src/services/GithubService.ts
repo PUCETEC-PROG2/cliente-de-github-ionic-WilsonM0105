@@ -72,3 +72,26 @@ export const createRepository = async (name: string, description: string): Promi
     
     }
   }
+
+// DELETE
+export const deleteRepository = async (owner: string, repo: string): Promise<void> => {
+  await axios.delete(`${GITHUB_API_URL}/repos/${owner}/${repo}`, {
+    headers: {
+      Authorization: `Bearer ${GITHUB_API_TOKEN}`,
+    },
+  });
+};
+
+// PATCH 
+export const updateRepository = async (
+  owner: string,
+  repo: string,
+  data: { name?: string; description?: string }
+): Promise<void> => {
+  await axios.patch(`${GITHUB_API_URL}/repos/${owner}/${repo}`, data, {
+    headers: {
+      Authorization: `Bearer ${GITHUB_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+  });
+};

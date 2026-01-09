@@ -4,7 +4,7 @@ import './Tab1.css';
 import RepoItem from '../components/Repoitem';
 import React from 'react';
 import { RepositoryItem } from '../interfaces/RepositoryItem';
-import { fetchRepositories } from '../services/GithubService';
+import { fetchRepositories, deleteRepository, updateRepository } from '../services/GithubService';
 import { language } from 'ionicons/icons';
 
 const Tab1: React.FC = () => {
@@ -15,10 +15,36 @@ const Tab1: React.FC = () => {
     setRepos(reposData);
   };
 
+  // función al confirmar eliminar
+  const onDelete = async (owner: string, repo: string) => {
+    try {
+      await deleteRepository(owner, repo);
+      // refrescar lista
+      loadRepos();
+    } catch (error) {
+      console.error("Error eliminando repositorio:", error);
+      alert("No se pudo eliminar el repositorio");
+    }
+  };
+
   useIonViewDidEnter(() => {
     console.log("******** Leyendo repos ... ********");
     loadRepos();
   });
+
+  const onUpdate = async (
+    owner: string,
+    repo: string,
+    data: { name?: string; description?: string }
+  ) => {
+    try {
+      await updateRepository(owner, repo, data);
+      loadRepos();
+    } catch (error) {
+      console.error("Error actualizando repositorio:", error);
+      alert("No se pudo actualizar el repositorio");
+    }
+  };
 
   return (
     <IonPage>
@@ -33,15 +59,18 @@ const Tab1: React.FC = () => {
             <IonTitle size="large">Repositorios</IonTitle>
           </IonToolbar>
         </IonHeader>
+
         <IonList>
           {repos.map((repo, index) => (
-            <RepoItem 
-              key={index} 
-              name = { repo.name } 
+            <RepoItem
+              key={index}
+              name={repo.name}
               description={repo.description}
-              imageUrl = { repo.imageUrl }
-              owner={repo.owner} 
+              imageUrl={repo.imageUrl}
+              owner={repo.owner}
               language={repo.language}
+              onDelete={onDelete}
+              onUpdate={onUpdate}
             />
           ))}
         </IonList>
